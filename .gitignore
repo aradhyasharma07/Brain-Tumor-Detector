@@ -6,6 +6,7 @@ __pycache__/
 *.pyc
 
 # PyTorch / model files
+backend/saved_models/
 *.pth
 *.pt
 *.onnx
@@ -33,3 +34,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Evaluation results
+backend/test_results.csv
