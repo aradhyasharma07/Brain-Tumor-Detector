@@ -19,14 +19,21 @@ def build_resnet50_model(num_classes: int = 4, freeze_backbone: bool = True) -> 
     weights = models.ResNet50_Weights.DEFAULT
     model = models.resnet50(weights=weights)
 
-    # Freeze pretrained backbone weights if requested
+    # Freeze pretrained backbone weights if requested, but unfreeze layer4 for fine-tuning
     if freeze_backbone:
         for param in model.parameters():
             param.requires_grad = False
+        for param in model.layer4.parameters():
+            param.requires_grad = True
 
     # Replace the final fully connected classification layer
     in_features = model.fc.in_features
-    model.fc = nn.Linear(in_features, num_classes)
+    model.fc = nn.Sequential(
+        nn.Linear(in_features, 512),
+        nn.ReLU(),
+        nn.Dropout(0.3),
+        nn.Linear(512, num_classes)
+    )
 
     return model
 

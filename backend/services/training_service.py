@@ -4,6 +4,7 @@ from typing import Dict, Any
 import torch
 import torch.nn as nn
 from torch.optim import Adam
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from backend.models.resnet_model import build_resnet50_model, get_parameter_counts
 from backend.utils.dataset_utils import (
@@ -22,9 +23,9 @@ class TrainingService:
         self,
         data_dir: str,
         save_dir: str = "backend/saved_models",
-        num_epochs: int = 5,
+        num_epochs: int = 20,
         batch_size: int = 32,
-        learning_rate: float = 0.001,
+        learning_rate: float = 0.0001,
         seed: int = 42
     ):
         self.data_dir = data_dir
@@ -73,9 +74,17 @@ class TrainingService:
 
         criterion = nn.CrossEntropyLoss()
         
-        # Optimize ONLY parameters with requires_grad=True (the new FC classification layer)
+        # Optimize ONLY parameters with requires_grad=True (includes layer4 and classification head)
         trainable_parameters = [p for p in model.parameters() if p.requires_grad]
         optimizer = Adam(trainable_parameters, lr=self.learning_rate)
+
+        # Learning Rate Scheduler: reduces LR by 0.5 when val_acc plateaus for 3 epochs
+        scheduler = ReduceLROnPlateau(
+            optimizer,
+            mode="max",
+            factor=0.5,
+            patience=3
+        )
 
         best_val_acc = 0.0
         best_val_loss = float("inf")
@@ -136,11 +145,16 @@ class TrainingService:
             history["val_loss"].append(epoch_val_loss)
             history["val_acc"].append(epoch_val_acc)
 
+            current_lr = optimizer.param_groups[0]["lr"]
             print(
                 f"Epoch [{epoch}/{self.num_epochs}] | "
+                f"LR: {current_lr:.6f} | "
                 f"Train Loss: {epoch_train_loss:.4f} - Train Acc: {epoch_train_acc:.4f} | "
                 f"Val Loss: {epoch_val_loss:.4f} - Val Acc: {epoch_val_acc:.4f}"
             )
+
+            # Update learning rate based on validation accuracy
+            scheduler.step(epoch_val_acc)
 
             # Save best checkpoint based on validation accuracy (or lower val loss as tiebreaker)
             if epoch_val_acc > best_val_acc or (epoch_val_acc == best_val_acc and epoch_val_loss < best_val_loss):
