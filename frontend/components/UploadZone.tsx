@@ -1,6 +1,14 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import {
+  UploadCloud,
+  FileImage,
+  RotateCcw,
+  Zap,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 
 interface UploadZoneProps {
   onFileSelected: (file: File) => void;
@@ -78,12 +86,20 @@ export default function UploadZone({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
-          className={`relative cursor-pointer w-full rounded-2xl border-2 border-dashed transition-all duration-300 p-8 sm:p-12 flex flex-col items-center justify-center text-center ${
+          className={`relative cursor-pointer w-full rounded-2xl border-2 border-dashed transition-all duration-300 p-8 sm:p-10 flex flex-col items-center justify-center text-center overflow-hidden group ${
             isDragOver
-              ? "border-cyan-400 bg-cyan-500/10 shadow-xl shadow-cyan-500/10 scale-[1.01]"
-              : "border-slate-800 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-900/80"
+              ? "border-[#22D3EE] bg-[#22D3EE]/5 shadow-xl shadow-[#22D3EE]/10 scale-[1.01]"
+              : "border-[#263245] bg-[#1A2336]/60 hover:border-[#3B82F6]/60 hover:bg-[#1A2336]/90"
           }`}
         >
+          {/* Smooth Moving Scan Line Overlay */}
+          <div
+            className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#22D3EE] to-transparent pointer-events-none opacity-70 shadow-[0_0_8px_#22D3EE]"
+            style={{
+              animation: "scanLine 3.5s linear infinite",
+            }}
+          />
+
           <input
             type="file"
             ref={fileInputRef}
@@ -92,39 +108,34 @@ export default function UploadZone({
             className="hidden"
           />
 
-          <div className="h-16 w-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4 text-cyan-400">
-            <svg
-              className="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
+          <div className="h-14 w-14 rounded-2xl bg-[#131A2A] border border-[#263245] flex items-center justify-center mb-4 text-[#22D3EE] group-hover:border-[#3B82F6]/50 shadow-inner transition-colors">
+            <UploadCloud className="w-7 h-7 text-[#22D3EE]" />
           </div>
 
-          <h3 className="text-base font-semibold text-slate-200 mb-1">
+          <h3 className="text-sm sm:text-base font-mono font-bold text-[#F8FAFC] tracking-wide mb-1">
             Drag & Drop MRI Brain Scan Here
           </h3>
-          <p className="text-xs text-slate-400 mb-4 max-w-xs">
-            Supported formats: JPG, JPEG, PNG, BMP, WEBP
+          <p className="text-xs text-[#94A3B8] mb-4 max-w-xs">
+            Supported Formats: JPG, JPEG, PNG, BMP, WEBP
           </p>
 
           <button
             type="button"
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition"
+            className="px-4 py-2 rounded-xl bg-[#131A2A] hover:bg-[#1A2336] text-[#F8FAFC] text-xs font-mono border border-[#263245] hover:border-[#3B82F6]/40 transition shadow-sm"
           >
-            Browse File
+            BROWSE MRI FILE
           </button>
         </div>
       ) : (
-        <div className="w-full bg-slate-900/60 rounded-2xl border border-slate-800 p-4 sm:p-6 flex flex-col items-center">
-          <div className="relative w-full max-w-sm aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800 mb-4 shadow-2xl flex items-center justify-center">
+        <div className="w-full bg-[#1A2336]/80 rounded-2xl border border-[#263245] p-4 sm:p-5 flex flex-col items-center">
+          <div className="relative w-full max-w-sm aspect-square rounded-xl overflow-hidden bg-[#0A0F1C] border border-[#263245] mb-4 shadow-2xl flex items-center justify-center group">
+            {/* Smooth Moving Scan Line for Preview Box */}
+            <div
+              className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#22D3EE] to-transparent pointer-events-none opacity-60 z-10 shadow-[0_0_8px_#22D3EE]"
+              style={{
+                animation: "scanLine 4s linear infinite",
+              }}
+            />
             {/* eslint-disable-next-next/no-img-element */}
             <img
               src={imagePreview}
@@ -134,22 +145,26 @@ export default function UploadZone({
           </div>
 
           {selectedFile && (
-            <div className="w-full flex items-center justify-between bg-slate-950/50 px-4 py-2.5 rounded-xl border border-slate-800/80 mb-4">
-              <div className="truncate mr-2">
-                <p className="text-xs font-medium text-slate-200 truncate">
-                  {selectedFile.name}
-                </p>
-                <p className="text-[10px] text-slate-400">
-                  {formatFileSize(selectedFile.size)}
-                </p>
+            <div className="w-full flex items-center justify-between bg-[#0A0F1C]/80 px-4 py-2.5 rounded-xl border border-[#263245] mb-4 font-mono">
+              <div className="truncate mr-2 flex items-center gap-2">
+                <FileImage className="w-4 h-4 text-[#22D3EE] shrink-0" />
+                <div className="truncate">
+                  <p className="text-xs font-bold text-[#F8FAFC] truncate">
+                    {selectedFile.name}
+                  </p>
+                  <p className="text-[10px] text-[#94A3B8]">
+                    {formatFileSize(selectedFile.size)}
+                  </p>
+                </div>
               </div>
 
               <button
                 onClick={onClear}
                 disabled={isLoading}
-                className="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-1 rounded-lg hover:bg-rose-500/10 transition disabled:opacity-50"
+                className="text-xs text-rose-400 hover:text-rose-300 font-mono px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition disabled:opacity-50 flex items-center gap-1 shrink-0"
               >
-                Change Image
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>CHANGE</span>
               </button>
             </div>
           )}
@@ -157,48 +172,17 @@ export default function UploadZone({
           <button
             onClick={onAnalyze}
             disabled={isLoading}
-            className="w-full py-3 px-6 rounded-xl font-semibold text-sm bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 transition-all transform active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 px-6 rounded-xl font-mono font-bold text-xs sm:text-sm bg-gradient-to-r from-[#3B82F6] to-[#2563EB] hover:from-[#2563EB] hover:to-[#1D4ED8] text-white shadow-lg shadow-[#3B82F6]/20 border border-[#3B82F6]/50 transition-all transform active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed tracking-widest uppercase"
           >
             {isLoading ? (
               <>
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span>Analyzing MRI Scan...</span>
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
+                <span>ANALYZING MRI SCAN...</span>
               </>
             ) : (
               <>
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-                <span>Analyze Scan with ResNet-50</span>
+                <Zap className="w-4 h-4 text-white" />
+                <span>ANALYZE SCAN WITH RESNET-50</span>
               </>
             )}
           </button>
@@ -207,26 +191,34 @@ export default function UploadZone({
 
       {/* Error Banners */}
       {(localError || error) && (
-        <div className="w-full p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-start gap-3 animate-fade-in">
-          <svg
-            className="w-5 h-5 text-rose-400 shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+        <div className="w-full p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-start gap-3">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="font-semibold mb-0.5">Error</p>
-            <p>{localError || error}</p>
+            <p className="font-bold font-mono uppercase mb-0.5">SCAN ERROR</p>
+            <p className="text-[11px] text-rose-200">{localError || error}</p>
           </div>
         </div>
       )}
+
+      {/* Embedded CSS for smooth scanLine keyframes */}
+      <style jsx>{`
+        @keyframes scanLine {
+          0% {
+            top: 0%;
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.8;
+          }
+          90% {
+            opacity: 0.8;
+          }
+          100% {
+            top: 100%;
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
