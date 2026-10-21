@@ -233,6 +233,80 @@ The training pipeline is implemented in `backend/services/training_service.py`:
 
 ---
 
+## 🧠 Pre-trained Model Download
+
+The trained ResNet-50 model is distributed separately from the source code because of its large file size.
+
+**Download:** [resnet50_brain_tumor.pth — Model v1.0](https://github.com/aradhyasharma07/Brain-Tumor-Detector/releases/download/v1.0/resnet50_brain_tumor.pth)
+
+### Model Setup
+
+1. Download `resnet50_brain_tumor.pth` from the release link above.
+2. Open the cloned project folder.
+3. Navigate to `backend/saved_models/`.
+4. Place the downloaded model file in that folder.
+
+The expected file path is:
+
+```text
+backend/
+└── saved_models/
+    └── resnet50_brain_tumor.pth
+```
+
+Do not rename the file unless you also update the model path in the backend configuration.
+
+## 🚀 Local Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/aradhyasharma07/Brain-Tumor-Detector.git
+cd Brain-Tumor-Detector
+```
+
+### 2. Set Up the Backend
+
+Open a terminal in the project root and run:
+
+**Windows PowerShell:**
+
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Download the trained model and place it at `backend/saved_models/resnet50_brain_tumor.pth` before running inference.
+
+Start the FastAPI backend:
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+The API documentation is normally available at `http://127.0.0.1:8000/docs` when the backend starts successfully.
+
+### 3. Set Up the Frontend
+
+Open a **second terminal** from the project root and run:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser.
+
+If the frontend requires environment variables, configure them using the project's `.env.example` file before starting the application.
+
+## ⚠️ Important Disclaimer
+
+This project is intended for educational and research purposes only. Its predictions are not a medical diagnosis and must not replace evaluation by a qualified healthcare professional.
+
+
 ## Confusion Matrix & Per-Class Performance
 
 ### Per-Class Metrics Table
