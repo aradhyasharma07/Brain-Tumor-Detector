@@ -6,11 +6,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-# Ensure backend package is discoverable
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Ensure backend directory is discoverable
+sys.path.insert(0, os.path.dirname(__file__))
 
-from backend.models.resnet_model import build_resnet50_model
-from backend.utils.dataset_utils import (
+from models.resnet_model import build_resnet50_model
+from utils.dataset_utils import (
     BrainTumorDataset,
     get_transforms,
     CLASS_NAMES,

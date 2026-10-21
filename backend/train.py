@@ -2,10 +2,10 @@ import argparse
 import sys
 import os
 
-# Add parent directory to sys.path if needed when running direct script
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Add backend directory to sys.path if needed when running direct script
+sys.path.insert(0, os.path.dirname(__file__))
 
-from backend.services.training_service import TrainingService
+from services.training_service import TrainingService
 
 
 def parse_args():

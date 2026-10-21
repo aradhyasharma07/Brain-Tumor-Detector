@@ -1,19 +1,75 @@
 import os
 import sys
+import argparse
 
-# Ensure backend package is discoverable
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Ensure backend directory is discoverable
+sys.path.insert(0, os.path.dirname(__file__))
 
-from backend.services.inference_service import InferenceService
-from backend.utils.dataset_utils import CLASS_NAMES
+from services.inference_service import InferenceService
+from utils.dataset_utils import CLASS_NAMES
+
+
+def find_sample_image(explicit_path=None):
+    if explicit_path:
+        if os.path.isfile(explicit_path):
+            return os.path.abspath(explicit_path)
+        return None
+
+    # Candidate locations relative to backend directory or workspace
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(backend_dir, "..", "..", "Brain Tumor Dataset"),
+        r"D:\SEM 5 all projects\Brain Tumor Dataset",
+        os.path.join(backend_dir, "..", "Brain Tumor Dataset"),
+    ]
+
+    for candidate_dir in candidates:
+        if not os.path.isdir(candidate_dir):
+            continue
+        # Check standard sample images
+        preferred = [
+            os.path.join(candidate_dir, "Training", "glioma", "Tr-gl_1.jpg"),
+            os.path.join(candidate_dir, "Testing", "glioma", "Te-gl_1.jpg"),
+            os.path.join(candidate_dir, "Testing", "notumor", "Te-no_10.jpg"),
+        ]
+        for p in preferred:
+            if os.path.isfile(p):
+                return os.path.abspath(p)
+        # Search for any valid image
+        for root, _, files in os.walk(candidate_dir):
+            for f in files:
+                if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".webp")):
+                    return os.path.abspath(os.path.join(root, f))
+    return None
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Brain Tumor ResNet50 - Inference Service Verification"
+    )
+    parser.add_argument(
+        "--image-path",
+        type=str,
+        default=None,
+        help="Path to an MRI test image for verification smoke test."
+    )
+    parser.add_argument(
+        "--checkpoint-path",
+        type=str,
+        default="backend/saved_models/resnet50_brain_tumor.pth",
+        help="Path to model checkpoint .pth file."
+    )
+    return parser.parse_args()
 
 
 def run_verification():
+    args = parse_args()
+
     print("=" * 65)
     print("      Brain Tumor ResNet50 - Inference Service Verification")
     print("=" * 65)
 
-    checkpoint_path = "backend/saved_models/resnet50_brain_tumor.pth"
+    checkpoint_path = args.checkpoint_path
     
     # 1. Verify Checkpoint Exists & Loads
     print(f"Check 1 - Model Checkpoint Path: {checkpoint_path}")
@@ -24,7 +80,15 @@ def run_verification():
     print(f"  -> Index mapping: {service.idx_to_class}")
 
     # 2. Verify Preprocessing & Single Image Inference
-    sample_image_path = r"C:\Users\aradhya\OneDrive\Desktop\Brain Tumor Dataset\Training\glioma\Tr-gl_1.jpg"
+    sample_image_path = find_sample_image(args.image_path)
+    if not sample_image_path:
+        print("\n" + "!" * 65)
+        print("ERROR: Sample MRI image not found.")
+        print("Please provide a valid image file using the --image-path argument:")
+        print("  python verify_inference.py --image-path <path_to_image>")
+        print("!" * 65)
+        sys.exit(1)
+
     print(f"\nCheck 2 - Running smoke test inference on sample image:")
     print(f"  -> Path: {sample_image_path}")
 

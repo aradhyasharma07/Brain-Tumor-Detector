@@ -6,8 +6,8 @@ import torch.nn as nn
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from backend.models.resnet_model import build_resnet50_model, get_parameter_counts
-from backend.utils.dataset_utils import (
+from models.resnet_model import build_resnet50_model, get_parameter_counts
+from utils.dataset_utils import (
     create_dataloaders,
     CLASS_TO_IDX,
     IDX_TO_CLASS,

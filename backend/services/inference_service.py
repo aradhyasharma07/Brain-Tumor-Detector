@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 
-from backend.models.resnet_model import build_resnet50_model
-from backend.utils.dataset_utils import CLASS_NAMES, IDX_TO_CLASS
+from models.resnet_model import build_resnet50_model
+from utils.dataset_utils import CLASS_NAMES, IDX_TO_CLASS
 
 
 class InferenceService:
@@ -21,7 +21,11 @@ class InferenceService:
 
         self.checkpoint_path = checkpoint_path
         if not os.path.exists(self.checkpoint_path):
-            raise FileNotFoundError(f"Model checkpoint not found at: {self.checkpoint_path}")
+            alt_path = self.checkpoint_path.replace("backend/", "")
+            if os.path.exists(alt_path):
+                self.checkpoint_path = alt_path
+            else:
+                raise FileNotFoundError(f"Model checkpoint not found at: {self.checkpoint_path}")
 
         # Load Checkpoint
         self.checkpoint = torch.load(self.checkpoint_path, map_location=self.device)

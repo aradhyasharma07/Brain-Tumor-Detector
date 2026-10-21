@@ -2,39 +2,35 @@
 
 import React from "react";
 import ApiStatus from "./ApiStatus";
+import { Brain, Sparkles } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <header className="w-full border-b border-[#263245] bg-[#0A0F1C]/90 backdrop-blur-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <svg
-              className="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              />
-            </svg>
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#1A2336] to-[#131A2A] border border-[#263245] flex items-center justify-center shadow-lg shadow-black/40 text-[#22D3EE] relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#3B82F6]/20 to-[#22D3EE]/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Brain className="w-5 h-5 text-[#22D3EE] relative z-10" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2">
-              NeuroScan AI
-              <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium">
+            <div className="flex items-center gap-2">
+              <h1 className="text-base sm:text-lg font-black tracking-tight text-[#F8FAFC]">
+                NEUROSCAN <span className="text-[#3B82F6]">AI</span>
+              </h1>
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-[#1A2336] text-[#22D3EE] border border-[#263245]">
                 ResNet-50
               </span>
-            </h1>
-            <p className="text-xs text-slate-400">Brain Tumor MRI Classification</p>
+            </div>
+            <p className="text-[11px] text-[#94A3B8] font-mono hidden sm:block">
+              Deep Learning Brain Tumor MRI Classification
+            </p>
           </div>
         </div>
 
-        <ApiStatus />
+        <div className="flex items-center gap-3">
+          <ApiStatus />
+        </div>
       </div>
     </header>
   );

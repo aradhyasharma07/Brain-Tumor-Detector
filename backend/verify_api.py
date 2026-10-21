@@ -2,16 +2,63 @@ import os
 import sys
 import io
 import asyncio
+import argparse
 from fastapi import UploadFile, HTTPException
 
-# Ensure backend package is discoverable
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Ensure backend directory is discoverable
+sys.path.insert(0, os.path.dirname(__file__))
 
-from backend.app.main import app, health, home
-from backend.app.routers.prediction_router import predict_mri, get_inference_service
+from app.main import app, health, home
+from app.routers.prediction_router import predict_mri, get_inference_service
+
+
+def find_sample_image(explicit_path=None):
+    if explicit_path:
+        if os.path.isfile(explicit_path):
+            return os.path.abspath(explicit_path)
+        return None
+
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(backend_dir, "..", "..", "Brain Tumor Dataset"),
+        r"D:\SEM 5 all projects\Brain Tumor Dataset",
+        os.path.join(backend_dir, "..", "Brain Tumor Dataset"),
+    ]
+
+    for candidate_dir in candidates:
+        if not os.path.isdir(candidate_dir):
+            continue
+        preferred = [
+            os.path.join(candidate_dir, "Training", "glioma", "Tr-gl_1.jpg"),
+            os.path.join(candidate_dir, "Testing", "glioma", "Te-gl_1.jpg"),
+            os.path.join(candidate_dir, "Testing", "notumor", "Te-no_10.jpg"),
+        ]
+        for p in preferred:
+            if os.path.isfile(p):
+                return os.path.abspath(p)
+        for root, _, files in os.walk(candidate_dir):
+            for f in files:
+                if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".webp")):
+                    return os.path.abspath(os.path.join(root, f))
+    return None
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Brain Tumor FastAPI Endpoint - Automated Verification"
+    )
+    parser.add_argument(
+        "--image-path",
+        type=str,
+        default=None,
+        help="Path to an MRI test image for endpoint testing."
+    )
+    return parser.parse_args()
 
 
 async def run_api_verification():
+    args = parse_args()
+
     print("=" * 65)
     print("      Brain Tumor FastAPI Endpoint - Automated Verification")
     print("=" * 65)
@@ -24,15 +71,24 @@ async def run_api_verification():
     print("  -> GET /health PASSED!\n")
 
     # 2. Verify Prediction Endpoint with Valid Image Upload
-    sample_image_path = r"C:\Users\aradhya\OneDrive\Desktop\Brain Tumor Dataset\Training\glioma\Tr-gl_1.jpg"
+    sample_image_path = find_sample_image(args.image_path)
+    if not sample_image_path:
+        print("\n" + "!" * 65)
+        print("ERROR: Sample MRI image not found for API verification.")
+        print("Please provide a valid image file using the --image-path argument:")
+        print("  python verify_api.py --image-path <path_to_image>")
+        print("!" * 65)
+        sys.exit(1)
+
     print(f"Test 2 - Verifying POST /api/v1/predict with sample MRI image:")
     print(f"  -> Path: {sample_image_path}")
 
+    filename = os.path.basename(sample_image_path)
     with open(sample_image_path, "rb") as f:
         image_bytes = f.read()
 
     upload_file = UploadFile(
-        filename="Tr-gl_1.jpg",
+        filename=filename,
         file=io.BytesIO(image_bytes),
         headers={"content-type": "image/jpeg"}
     )

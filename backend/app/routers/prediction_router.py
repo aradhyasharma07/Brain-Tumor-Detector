@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, File, UploadFile, HTTPException, status, Depends
-from backend.services.inference_service import InferenceService
-from backend.schemas.prediction_schema import PredictionResponse
+from services.inference_service import InferenceService
+from schemas.prediction_schema import PredictionResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Inference"])
 

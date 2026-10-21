@@ -21,25 +21,29 @@ export default function ApiStatus() {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800 text-xs">
-      <span className="relative flex h-2.5 w-2.5">
+    <div
+      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#131A2A] border border-[#263245] text-xs font-mono transition-colors shadow-sm"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="relative flex h-2 w-2">
         {isHealthy === true && (
           <>
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75 motion-reduce:hidden" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
           </>
         )}
         {isHealthy === false && (
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#EF4444]" />
         )}
         {isHealthy === null && (
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500 animate-pulse"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F59E0B] animate-pulse motion-reduce:animate-none" />
         )}
       </span>
-      <span className="text-slate-300 font-medium">
-        {isHealthy === true && "API Online"}
-        {isHealthy === false && "API Offline"}
-        {isHealthy === null && (isChecking ? "Checking..." : "Connecting...")}
+      <span className="text-[#94A3B8] text-[11px] font-medium">
+        {isHealthy === true && <span className="text-[#22C55E]">Inference API Online</span>}
+        {isHealthy === false && <span className="text-[#EF4444]">Inference API Offline</span>}
+        {isHealthy === null && (isChecking ? "Checking API..." : "Connecting...")}
       </span>
     </div>
   );

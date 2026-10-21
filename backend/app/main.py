@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.routers.prediction_router import router as prediction_router
+from app.routers.prediction_router import router as prediction_router
 
 app = FastAPI(
     title="Brain Tumor MRI Classifier API",
