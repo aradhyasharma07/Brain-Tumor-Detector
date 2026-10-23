@@ -95,7 +95,7 @@ Brain Tumor Detector/
 │   │   ├── main.py                     # FastAPI application entry point, CORS, and health endpoints
 │   │   └── routers/
 │   │       ├── __init__.py
-│   │       └── prediction_router.py    # POST /api/v1/predict upload and inference handler
+│   │       └── prediction_router.py    # POST /api/v1/predict upload, validation & inference handler
 │   ├── models/
 │   │   ├── __init__.py
 │   │   └── resnet_model.py             # ResNet-50 architecture builder and parameter utilities
@@ -108,7 +108,8 @@ Brain Tumor Detector/
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── inference_service.py        # Checkpoint loader, transform pipeline, and predict logic
-│   │   └── training_service.py         # Full training loop, early stopping, and scheduler
+│   │   ├── training_service.py         # Full training loop, early stopping, and scheduler
+│   │   └── validation_service.py       # Multi-layer MRI validation & OOD detection service
 │   ├── utils/
 │   │   ├── __init__.py
 │   │   └── dataset_utils.py            # PyTorch Dataset, augmentation transforms, and DataLoader splits
@@ -116,6 +117,7 @@ Brain Tumor Detector/
 │   ├── evaluate_model.py               # Single-image inference evaluation script with CSV export
 │   ├── requirements.txt                # Python backend dependencies
 │   ├── test_results.csv                # Detailed evaluation records per test image
+│   ├── test_validation.py              # Automated test suite for all MRI validation & OOD safeguards
 │   ├── train.py                        # CLI entry point to trigger training
 │   ├── verify_api.py                   # Automated test script for FastAPI endpoints
 │   └── verify_inference.py             # Smoke test script for model checkpoint and inference pipeline
@@ -463,16 +465,22 @@ NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
 
 ## Verification & Testing Scripts
 
-The repository includes standalone validation scripts located in the `backend/` directory:
+The repository includes standalone validation and testing scripts located in the `backend/` directory:
 
-### 1. Verify Model Inference Pipeline
+### 1. Comprehensive MRI Input Validation & OOD Safeguards Test Suite
+Tests all 7 required scenarios (all 4 valid MRI classes, natural photographs, screenshots, corrupt files, empty uploads, tiny/malformed images, and synthetic scans) to verify non-MRI inputs are rejected with HTTP 400:
+```powershell
+python backend/test_validation.py
+```
+
+### 2. Verify Model Inference Pipeline
 Performs a smoke test on checkpoint loading, tensor shapes, and single-image prediction:
 ```powershell
 python backend/verify_inference.py
 ```
 *Optional:* Specify a custom image using `--image-path <path_to_image>`.
 
-### 2. Verify FastAPI Endpoints
+### 3. Verify FastAPI Endpoints
 Tests the `/health` endpoint, valid image upload, invalid extension rejection, and corrupted byte detection:
 ```powershell
 python backend/verify_api.py

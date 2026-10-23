@@ -5,19 +5,23 @@ import { checkBackendHealth } from "@/lib/api";
 
 export default function ApiStatus() {
   const [isHealthy, setIsHealthy] = useState<boolean | null>(null);
-  const [isChecking, setIsChecking] = useState<boolean>(false);
-
-  const verifyHealth = async () => {
-    setIsChecking(true);
-    const online = await checkBackendHealth();
-    setIsHealthy(online);
-    setIsChecking(false);
-  };
 
   useEffect(() => {
-    verifyHealth();
-    const interval = setInterval(verifyHealth, 15000); // Check every 15s
-    return () => clearInterval(interval);
+    let mounted = true;
+    checkBackendHealth().then((online) => {
+      if (mounted) setIsHealthy(online);
+    });
+
+    const interval = setInterval(() => {
+      checkBackendHealth().then((online) => {
+        if (mounted) setIsHealthy(online);
+      });
+    }, 15000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -43,7 +47,7 @@ export default function ApiStatus() {
       <span className="text-[#94A3B8] text-[11px] font-medium">
         {isHealthy === true && <span className="text-[#22C55E]">Inference API Online</span>}
         {isHealthy === false && <span className="text-[#EF4444]">Inference API Offline</span>}
-        {isHealthy === null && (isChecking ? "Checking API..." : "Connecting...")}
+        {isHealthy === null && "Connecting..."}
       </span>
     </div>
   );

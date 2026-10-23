@@ -44,3 +44,28 @@ export async function predictMriImage(file: File): Promise<PredictionResponse> {
 
   return response.json();
 }
+
+export async function downloadPdfReport(file: File): Promise<Blob> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/report`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    let errorMessage = `Failed to generate PDF report (${response.status})`;
+    try {
+      const errorData = await response.json();
+      if (errorData.detail) {
+        errorMessage = errorData.detail;
+      }
+    } catch {
+      // Fallback
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.blob();
+}

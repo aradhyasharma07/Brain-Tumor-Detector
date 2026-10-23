@@ -13,7 +13,6 @@ import {
   Layers,
   Zap,
   Radio,
-  AlertTriangle,
   Cpu,
   Shield,
 } from "lucide-react";
@@ -240,7 +239,11 @@ export default function Home() {
               {/* Dynamic Prediction Result Card */}
               {prediction && (
                 <div className="mt-5 pt-5 border-t border-[#263245]">
-                  <PredictionResult result={prediction} />
+                  <PredictionResult
+                    result={prediction}
+                    selectedFile={selectedFile}
+                    imagePreview={imagePreview}
+                  />
                 </div>
               )}
             </div>

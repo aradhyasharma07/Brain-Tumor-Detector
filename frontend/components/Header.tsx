@@ -2,7 +2,7 @@
 
 import React from "react";
 import ApiStatus from "./ApiStatus";
-import { Brain, Sparkles } from "lucide-react";
+import { Brain } from "lucide-react";
 
 export default function Header() {
   return (

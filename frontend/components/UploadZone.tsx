@@ -8,7 +8,7 @@ import {
   Zap,
   AlertCircle,
   Loader2,
-  CheckCircle2,
+  
 } from "lucide-react";
 
 interface UploadZoneProps {
@@ -22,6 +22,7 @@ interface UploadZoneProps {
 }
 
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "webp"];
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB limit
 
 export default function UploadZone({
   onFileSelected,
@@ -42,6 +43,16 @@ export default function UploadZone({
     if (!ALLOWED_EXTENSIONS.includes(ext)) {
       setLocalError(
         `Unsupported format (.${ext || "unknown"}). Please select an MRI scan in JPG, JPEG, PNG, BMP, or WEBP format.`
+      );
+      return;
+    }
+    if (file.size === 0) {
+      setLocalError("Selected file is empty. Please select a valid brain MRI scan.");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setLocalError(
+        `File size exceeds the 10MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please upload a standard brain MRI scan.`
       );
       return;
     }
