@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, File, UploadFile, HTTPException, status, Depends, Response, Query
 from services.inference_service import InferenceService
@@ -79,7 +80,8 @@ async def predict_mri(
         probabilities=result["probabilities"],
         class_scores=result.get("class_scores"),
         gradcam_image=result.get("gradcam_image"),
-        prediction_id=prediction_id
+        prediction_id=prediction_id,
+        timestamp=datetime.now(timezone.utc).isoformat()
     )
 
 

@@ -19,6 +19,7 @@ class PredictionResponse(BaseModel):
     class_scores: Optional[List[ClassScoreItem]] = Field(default=None, description="Ordered canonical class scores list")
     gradcam_image: Optional[str] = Field(default=None, description="Grad-CAM overlay JPEG data URI")
     prediction_id: Optional[str] = Field(default=None, description="Unique prediction identifier")
+    timestamp: Optional[str] = Field(default=None, description="Authoritative server UTC generation timestamp in ISO 8601 format")
 
     class Config:
         json_schema_extra = {
@@ -40,6 +41,7 @@ class PredictionResponse(BaseModel):
                     {"class_name": "notumor", "display_name": "No Tumor Detected", "score": 0.0095, "percentage": 0.95, "is_highest": False}
                 ],
                 "gradcam_image": "data:image/jpeg;base64,...",
-                "prediction_id": "PRED-8A7B2C"
+                "prediction_id": "PRED-8A7B2C",
+                "timestamp": "2026-10-23T05:15:00Z"
             }
         }

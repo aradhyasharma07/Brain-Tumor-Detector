@@ -17,6 +17,7 @@ export interface PredictionResponse {
   class_scores?: ClassScore[];
   gradcam_image?: string | null;
   prediction_id?: string;
+  timestamp?: string;
 }
 
 export interface HealthResponse {
